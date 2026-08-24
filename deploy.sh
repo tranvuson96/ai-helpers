@@ -131,14 +131,20 @@ fi
 if [ "$RUN_9ROUTER" = true ]; then
   echo -e "${BLUE}--> Building 9Router...${NC}"
   cd "$SCRIPT_DIR/9router"
-  if [ ! -d "node_modules" ]; then pnpm install; fi
+  if [ ! -d "node_modules" ]; then
+    pnpm approve-builds --all 2>/dev/null || true
+    pnpm install || pnpm install --ignore-scripts
+  fi
   if [ ! -d ".next" ]; then pnpm run build; fi
 fi
 
 if [ "$RUN_DSH" = true ]; then
   echo -e "${BLUE}--> Installing DeepSeek Harness dependencies...${NC}"
   cd "$SCRIPT_DIR/dsh"
-  if [ ! -d "node_modules" ]; then pnpm install; fi
+  if [ ! -d "node_modules" ]; then
+    pnpm approve-builds --all 2>/dev/null || true
+    pnpm install || pnpm install --ignore-scripts
+  fi
 fi
 
 # --- 4. Generate Local Nginx Configurations ---
