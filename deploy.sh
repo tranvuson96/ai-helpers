@@ -118,8 +118,15 @@ for cmd in node npm pnpm pm2 nginx; do
   fi
 done
 
-# --- 3. Install Dependencies & Build ---
-echo -e "\n${YELLOW}[3/5] Installing dependencies and building projects...${NC}"
+# --- 3. Check Submodules, Install Dependencies & Build ---
+echo -e "\n${YELLOW}[3/5] Checking submodules, installing dependencies and building projects...${NC}"
+
+# Auto-initialize submodules if empty
+if [ ! -f "$SCRIPT_DIR/9router/package.json" ] || [ ! -f "$SCRIPT_DIR/dsh/package.json" ]; then
+  echo -e "${BLUE}--> Submodules empty. Running 'git submodule update --init --recursive'...${NC}"
+  cd "$SCRIPT_DIR"
+  git submodule update --init --recursive || true
+fi
 
 if [ "$RUN_9ROUTER" = true ]; then
   echo -e "${BLUE}--> Building 9Router...${NC}"
