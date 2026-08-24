@@ -16,6 +16,7 @@ echo -e "${BLUE}====================================================${NC}"
 ROUTER_DOMAIN="${ROUTER_DOMAIN:-router.sontv.test}"
 DSH_DOMAIN="${DSH_DOMAIN:-dsh.sontv.test}"
 SELECTED_APP="${ONLY:-all}"
+INITIAL_PASSWORD="${INITIAL_PASSWORD:-}"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -31,6 +32,10 @@ while [[ $# -gt 0 ]]; do
       SELECTED_APP="$2"
       shift 2
       ;;
+    --initial-password|--password)
+      INITIAL_PASSWORD="$2"
+      shift 2
+      ;;
     -h|--help)
       echo "Usage: ./deploy.sh [OPTIONS]"
       echo ""
@@ -38,12 +43,12 @@ while [[ $# -gt 0 ]]; do
       echo "  --only APP_NAME          Select specific agent to deploy: '9router', 'dsh', or 'all' (default: all)"
       echo "  --router-domain DOMAIN   Domain name for 9Router (default: router.sontv.test)"
       echo "  --dsh-domain DOMAIN      Domain name for DeepSeek Harness (default: dsh.sontv.test)"
+      echo "  --initial-password PASS  Set initial login password for 9Router"
       echo "  -h, --help               Show this help message"
       echo ""
       echo "Examples:"
-      echo "  ./deploy.sh --only 9router"
-      echo "  ./deploy.sh --only dsh"
-      echo "  ./deploy.sh --only all"
+      echo "  ./deploy.sh --only 9router --initial-password 'MySecurePassword123'"
+      echo "  INITIAL_PASSWORD='MyPassword' ./deploy.sh"
       echo ""
       exit 0
       ;;
@@ -59,17 +64,14 @@ case "$SELECTED_APP" in
   9router|router)
     RUN_9ROUTER=true
     RUN_DSH=false
-    PM2_ONLY_FLAG="--only 9router"
     ;;
   dsh|deepseek|deepseek-harness)
     RUN_9ROUTER=false
     RUN_DSH=true
-    PM2_ONLY_FLAG="--only deepseek-harness"
     ;;
   all|*)
     RUN_9ROUTER=true
     RUN_DSH=true
-    PM2_ONLY_FLAG=""
     ;;
 esac
 
@@ -79,6 +81,11 @@ echo -e "${YELLOW}[1/5] Configuration:${NC}"
 echo -e "  - Selected Target(s):   ${GREEN}${SELECTED_APP}${NC}"
 if [ "$RUN_9ROUTER" = true ]; then
   echo -e "  - 9Router Domain:       ${GREEN}${ROUTER_DOMAIN}${NC}"
+  if [ -n "$INITIAL_PASSWORD" ]; then
+    echo -e "  - 9Router Initial Pass: ${GREEN}(Custom password set)${NC}"
+  else
+    echo -e "  - 9Router Initial Pass: ${YELLOW}123456 (Default - set via --initial-password)${NC}"
+  fi
 fi
 if [ "$RUN_DSH" = true ]; then
   echo -e "  - DeepSeek Harness Domain: ${GREEN}${DSH_DOMAIN}${NC}"
@@ -136,6 +143,15 @@ if [ "$RUN_9ROUTER" = true ]; then
     pnpm install || pnpm install --ignore-scripts
   fi
   if [ ! -d ".next" ]; then pnpm run build; fi
+  
+  # Update .env if INITIAL_PASSWORD provided
+  if [ -n "$INITIAL_PASSWORD" ]; then
+    if [ -f .env ]; then
+      sed -i "s/^INITIAL_PASSWORD=.*/INITIAL_PASSWORD=\"$INITIAL_PASSWORD\"/" .env 2>/dev/null || echo "INITIAL_PASSWORD=\"$INITIAL_PASSWORD\"" >> .env
+    else
+      echo "INITIAL_PASSWORD=\"$INITIAL_PASSWORD\"" > .env
+    fi
+  fi
 fi
 
 if [ "$RUN_DSH" = true ]; then
@@ -242,15 +258,17 @@ fi
 echo -e "\n${YELLOW}[5/5] Starting PM2 processes...${NC}"
 cd "$SCRIPT_DIR"
 
+export INITIAL_PASSWORD="${INITIAL_PASSWORD:-123456}"
+
 if [ "$RUN_9ROUTER" = true ] && [ "$RUN_DSH" = false ]; then
   pm2 delete 9router 2>/dev/null || true
-  ROUTER_BASE_URL="http://$ROUTER_DOMAIN" pm2 start "$SCRIPT_DIR/config/ecosystem.config.js" --only 9router
+  ROUTER_BASE_URL="http://$ROUTER_DOMAIN" INITIAL_PASSWORD="$INITIAL_PASSWORD" pm2 start "$SCRIPT_DIR/config/ecosystem.config.js" --only 9router
 elif [ "$RUN_DSH" = true ] && [ "$RUN_9ROUTER" = false ]; then
   pm2 delete deepseek-harness 2>/dev/null || true
   pm2 start "$SCRIPT_DIR/config/ecosystem.config.js" --only deepseek-harness
 else
   pm2 delete 9router deepseek-harness 2>/dev/null || true
-  ROUTER_BASE_URL="http://$ROUTER_DOMAIN" pm2 start "$SCRIPT_DIR/config/ecosystem.config.js"
+  ROUTER_BASE_URL="http://$ROUTER_DOMAIN" INITIAL_PASSWORD="$INITIAL_PASSWORD" pm2 start "$SCRIPT_DIR/config/ecosystem.config.js"
 fi
 
 pm2 save
@@ -272,4 +290,9 @@ fi
 echo -e "Basic Auth Credentials:"
 echo -e "  - User: ${YELLOW}admin${NC}"
 echo -e "  - Pass: ${YELLOW}admin${NC} (or contents of /etc/nginx/.htpasswd)"
+if [ "$RUN_9ROUTER" = true ]; then
+  echo -e "9Router Initial Dashboard Login:"
+  echo -e "  - Password: ${GREEN}${INITIAL_PASSWORD}${NC}"
+fi
 echo ""
+EOF

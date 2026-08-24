@@ -13,6 +13,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 20128,
         HOST: '127.0.0.1',
+        INITIAL_PASSWORD: process.env.INITIAL_PASSWORD || '123456',
+        JWT_SECRET: process.env.JWT_SECRET || 'secret-jwt-token-key-9router-prod',
         NEXT_PUBLIC_BASE_URL: process.env.ROUTER_BASE_URL || 'http://router.sontv.test'
       }
     },
