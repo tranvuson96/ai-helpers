@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js & Build outputs
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# Local Environment & Logs
+.env
+.env*.local
+*.log
+logs/
+
+# Generated deployment configs & runtime storage
+config/nginx/*.conf
+config/storages/
+config/profiles/node_modules/
+
+# Submodule build artifacts
+9router/.next/
+dsh/.dsh-build/
+
+# OS & IDE & Local
+.local/
+.pm2/
+.DS_Store
+.vscode/
+.idea/

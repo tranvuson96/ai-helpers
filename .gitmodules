@@ -1,0 +1,6 @@
+[submodule "9router"]
+	path = 9router
+	url = https://github.com/decolua/9router.git
+[submodule "dsh"]
+	path = dsh
+	url = https://github.com/deepseek-ai/deepseek-harness.git
