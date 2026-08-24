@@ -38,12 +38,12 @@ Bạn có thể kết hợp lựa chọn Agent và truyền tên miền tùy ch�
 
 #### Cách 1: Sử dụng tham số dòng lệnh (CLI flags)
 ```bash
-./deploy.sh --only 9router --router-domain router.mydomain.com
+./deploy.sh --only 9router --router-domain 9router.sontv.io.vn --initial-password "MatKhauBaoMatCuaBan123!"
 ```
 
 #### Cách 2: Sử dụng Biến môi trường (Environment variables)
 ```bash
-ONLY="dsh" DSH_DOMAIN="dsh.mydomain.com" ./deploy.sh
+INITIAL_PASSWORD="MatKhauBaoMatCuaBan123!" ROUTER_DOMAIN="9router.sontv.io.vn" ./deploy.sh
 ```
 
 ---
