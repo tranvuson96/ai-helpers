@@ -34,7 +34,7 @@ module.exports = {
       name: 'hermes-agent',
       cwd: path.join(rootDir, 'hermes', 'web'),
       script: 'pnpm',
-      args: 'run dev --host 127.0.0.1 --port 3090',
+      args: 'exec vite --host 0.0.0.0 --port 3090',
       interpreter: 'none',
       env: {
         NODE_ENV: 'production',
