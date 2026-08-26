@@ -26,7 +26,10 @@ Nếu bạn chỉ muốn chọn triển khai một Agent riêng lẻ (ví dụ c
 # Chỉ deploy DeepSeek Harness:
 ./deploy.sh --only dsh
 
-# Triển khai cả hai (Mặc định):
+# Chỉ deploy Hermes Agent:
+./deploy.sh --only hermes
+
+# Triển khai cả ba Agent (Mặc định):
 ./deploy.sh --only all
 ```
 
@@ -38,7 +41,7 @@ Bạn có thể kết hợp lựa chọn Agent và truyền tên miền tùy ch�
 
 #### Cách 1: Sử dụng tham số dòng lệnh (CLI flags)
 ```bash
-./deploy.sh --only 9router --router-domain 9router.sontv.io.vn --initial-password "MatKhauBaoMatCuaBan123!"
+./deploy.sh --only hermes --hermes-domain hermes.mydomain.com
 ```
 
 #### Cách 2: Sử dụng Biến môi trường (Environment variables)
