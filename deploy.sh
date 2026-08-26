@@ -138,11 +138,20 @@ done
 # --- 3. Check Submodules, Install Dependencies & Build ---
 echo -e "\n${YELLOW}[3/5] Checking submodules, installing dependencies and building projects...${NC}"
 
-# Auto-initialize submodules if empty
-if [ ! -f "$SCRIPT_DIR/9router/package.json" ] || [ ! -f "$SCRIPT_DIR/dsh/package.json" ] || [ ! -d "$SCRIPT_DIR/hermes" ]; then
-  echo -e "${BLUE}--> Submodules empty. Running 'git submodule update --init --recursive'...${NC}"
-  cd "$SCRIPT_DIR"
-  git submodule update --init --recursive || true
+# Auto-initialize target submodule if empty
+if [ "$RUN_9ROUTER" = true ] && [ ! -f "$SCRIPT_DIR/9router/package.json" ]; then
+  echo -e "${BLUE}--> Submodule 9router empty. Running 'git submodule update --init 9router'...${NC}"
+  cd "$SCRIPT_DIR" && git submodule update --init 9router || true
+fi
+
+if [ "$RUN_DSH" = true ] && [ ! -f "$SCRIPT_DIR/dsh/package.json" ]; then
+  echo -e "${BLUE}--> Submodule dsh empty. Running 'git submodule update --init dsh'...${NC}"
+  cd "$SCRIPT_DIR" && git submodule update --init dsh || true
+fi
+
+if [ "$RUN_HERMES" = true ] && [ ! -f "$SCRIPT_DIR/hermes/package.json" ]; then
+  echo -e "${BLUE}--> Submodule hermes empty. Running 'git submodule update --init hermes'...${NC}"
+  cd "$SCRIPT_DIR" && git submodule update --init hermes || true
 fi
 
 if [ "$RUN_9ROUTER" = true ]; then
