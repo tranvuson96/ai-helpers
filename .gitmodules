@@ -4,3 +4,6 @@
 [submodule "dsh"]
 	path = dsh
 	url = https://github.com/deepseek-ai/deepseek-harness.git
+[submodule "hermes"]
+	path = hermes
+	url = https://github.com/NousResearch/Hermes-Agent.git
