@@ -185,6 +185,9 @@ fi
 if [ "$RUN_HERMES" = true ]; then
   echo -e "${BLUE}--> Installing Hermes Agent dependencies...${NC}"
   cd "$SCRIPT_DIR/hermes/web"
+  if ! grep -q "allowedHosts" vite.config.ts 2>/dev/null; then
+    sed -i '/server: {/a \    allowedHosts: true,' vite.config.ts 2>/dev/null || true
+  fi
   if [ ! -d "node_modules" ]; then
     pnpm approve-builds --all 2>/dev/null || true
     pnpm install || pnpm install --ignore-scripts
